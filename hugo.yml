@@ -1,4 +1,4 @@
-baseURL: "https://haozhang.github.io/"
+baseURL: "https://haozhang2027.github.io/"
 defaultContentLanguage: en
 title: "Hao's Blogs"
 theme: "PaperMod"
@@ -63,7 +63,7 @@ params:
     Content: "Thoughts on software, AI, learning, and life."
   socialIcons:
     - name: github
-      url: "https://github.com/haozhang"
+      url: "https://github.com/haozhang2027"
     - name: email
       url: "mailto:haozhang2027@gmail.com"
     - name: rss
