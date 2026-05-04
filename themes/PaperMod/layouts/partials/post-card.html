@@ -1,0 +1,13 @@
+<article class="post-card">
+  <p class="card-meta">{{ .Date.Format "Jan 2, 2006" }}</p>
+  <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+  <p>{{ .Summary | plainify | truncate 160 }}</p>
+  {{ with .Params.tags }}
+    <div class="tag-row">
+      {{ range . }}
+        <a href="{{ "/tags/" | relURL }}{{ . | urlize }}/">{{ . }}</a>
+      {{ end }}
+    </div>
+  {{ end }}
+</article>
+

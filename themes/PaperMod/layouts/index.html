@@ -1,0 +1,25 @@
+{{ define "main" }}
+<section class="hero">
+  <p class="eyebrow">Personal blog</p>
+  <h1>{{ .Site.Params.homeInfoParams.Title }}</h1>
+  <p class="lede">{{ .Site.Params.homeInfoParams.Content }}</p>
+  <div class="hero-links">
+    <a href="{{ "/about/" | relURL }}">About</a>
+    <a href="{{ "/projects/" | relURL }}">Projects</a>
+    <a href="mailto:haozhang2027@gmail.com">Contact</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Recent Posts</h2>
+    <a href="{{ "/posts/" | relURL }}">All posts</a>
+  </div>
+  <div class="post-list">
+    {{ range first 5 (where .Site.RegularPages "Section" "posts") }}
+      {{ partial "post-card.html" . }}
+    {{ end }}
+  </div>
+</section>
+{{ end }}
+

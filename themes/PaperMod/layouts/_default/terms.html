@@ -1,0 +1,13 @@
+{{ define "main" }}
+<section class="section">
+  <div class="section-head">
+    <h1>{{ .Title }}</h1>
+  </div>
+  <div class="tag-cloud">
+    {{ range .Data.Terms.Alphabetical }}
+      <a href="{{ .Page.RelPermalink }}">{{ .Page.Title }} <span>({{ .Count }})</span></a>
+    {{ end }}
+  </div>
+</section>
+{{ end }}
+

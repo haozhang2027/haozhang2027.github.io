@@ -1,0 +1,290 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f7f5f2;
+  --panel: #ffffff;
+  --text: #171717;
+  --muted: #66635f;
+  --line: #ddd7d0;
+  --link: #114b8b;
+  --link-hover: #0b3564;
+  --accent: #1f6feb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --panel: #1b1b1b;
+    --text: #ededed;
+    --muted: #a7a29b;
+    --line: #303030;
+    --link: #8ab4f8;
+    --link-hover: #c1d8ff;
+    --accent: #8ab4f8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+}
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+.site-shell {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 20px 56px;
+}
+
+.topbar,
+.footer,
+.hero,
+.section,
+.article {
+  width: 100%;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 6px 0 28px;
+}
+
+.brand {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: flex-end;
+}
+
+.nav a {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.hero {
+  padding: 40px 0 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.hero h1,
+.section h1,
+.article h1 {
+  margin: 0;
+  line-height: 1.15;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+}
+
+.lede {
+  max-width: 60ch;
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 1.08rem;
+}
+
+.hero-links,
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.hero-links a,
+.tag-row a,
+.tag-cloud a {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.section {
+  padding: 28px 0;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-head h1,
+.section-head h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.page-content {
+  max-width: 70ch;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+
+.post-list {
+  display: grid;
+  gap: 16px;
+}
+
+.post-card,
+.archive-year,
+.toc,
+.article-body {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.post-card h2 {
+  margin: 6px 0 8px;
+  font-size: 1.2rem;
+}
+
+.post-card p,
+.card-meta,
+.meta,
+.footer,
+.search-status {
+  color: var(--muted);
+}
+
+.card-meta,
+.meta {
+  font-size: 0.92rem;
+}
+
+.meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.article-header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 24px;
+}
+
+.article-body {
+  max-width: 74ch;
+}
+
+.article-body img {
+  max-width: 100%;
+  height: auto;
+}
+
+.toc {
+  margin: 0 0 20px;
+}
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.archive-list {
+  display: grid;
+  gap: 20px;
+}
+
+.archive-year h2 {
+  margin: 0 0 12px;
+}
+
+.archive-items {
+  display: grid;
+  gap: 10px;
+}
+
+.archive-items a {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  color: var(--text);
+}
+
+.search-page {
+  max-width: 760px;
+}
+
+.search-input {
+  width: 100%;
+  margin: 8px 0 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 28px 0 0;
+  border-top: 1px solid var(--line);
+  margin-top: 24px;
+  font-size: 0.94rem;
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer span {
+  margin: 0 6px;
+}
+
+@media (max-width: 720px) {
+  .topbar,
+  .section-head,
+  .footer,
+  .archive-items a {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav {
+    justify-content: flex-start;
+  }
+
+  .site-shell {
+    padding-inline: 16px;
+  }
+}
+

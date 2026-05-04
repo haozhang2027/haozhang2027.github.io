@@ -1,0 +1,23 @@
+{{ define "main" }}
+<section class="section">
+  <div class="section-head">
+    <h1>{{ .Title }}</h1>
+  </div>
+  <div class="archive-list">
+    {{ range (.Site.RegularPages.ByDate.Reverse.GroupByDate "2006") }}
+      <div class="archive-year">
+        <h2>{{ .Key }}</h2>
+        <div class="archive-items">
+          {{ range .Pages }}
+            <a href="{{ .RelPermalink }}">
+              <span>{{ .Date.Format "Jan 2" }}</span>
+              <strong>{{ .Title }}</strong>
+            </a>
+          {{ end }}
+        </div>
+      </div>
+    {{ end }}
+  </div>
+</section>
+{{ end }}
+

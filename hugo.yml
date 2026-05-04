@@ -1,0 +1,74 @@
+baseURL: "https://haozhang.github.io/"
+defaultContentLanguage: en
+title: "Hao's Blogs"
+theme: "PaperMod"
+paginate: 10
+enableRobotsTXT: true
+
+languages:
+  en:
+    locale: en-US
+    label: English
+    weight: 1
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+
+menus:
+  main:
+    - name: Posts
+      pageRef: /posts
+      weight: 10
+    - name: Archives
+      pageRef: /archives
+      weight: 20
+    - name: Tags
+      pageRef: /tags
+      weight: 30
+    - name: Projects
+      pageRef: /projects
+      weight: 40
+    - name: About
+      pageRef: /about
+      weight: 50
+    - name: Search
+      pageRef: /search
+      weight: 60
+
+taxonomies:
+  tag: tags
+  category: categories
+
+params:
+  env: production
+  title: "Hao's Blogs"
+  description: "Thoughts on software, AI, learning, and life."
+  author: Hao Zhang
+  mainSections:
+    - posts
+  defaultTheme: auto
+  ShowReadingTime: true
+  ShowShareButtons: false
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSectionTermList: true
+  ShowFullTextinRSS: true
+  ShowToc: true
+  homeInfoParams:
+    Title: "Hao's Blogs"
+    Content: "Thoughts on software, AI, learning, and life."
+  socialIcons:
+    - name: github
+      url: "https://github.com/haozhang"
+    - name: email
+      url: "mailto:haozhang2027@gmail.com"
+    - name: rss
+      url: "/index.xml"
+
+markup:
+  highlight:
+    noClasses: false
