@@ -9,14 +9,6 @@ categories:
   - updates
 ---
 
-Welcome to Hao's Blogs.
+AI coding 使用指南
 
-This site will collect notes on software, AI, learning, and life.
-
-## Why this site exists
-
-I want one place for short notes, longer thoughts, and project write-ups.
-
-## 为什么写这个站
-
-我想把零散的想法、项目记录和学习笔记放在一个地方。
+1. obsidian+ deepseek +claude code 
