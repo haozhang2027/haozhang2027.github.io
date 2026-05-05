@@ -70,5 +70,8 @@ params:
       url: "/index.xml"
 
 markup:
+  goldmark:
+    extensions:
+      wikilinks: true
   highlight:
     noClasses: false
