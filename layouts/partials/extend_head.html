@@ -4,13 +4,21 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js" integrity="sha384-cXaQXtC0H2M3BUf9RJ0GS9CxguIMmTzVjceFm9QxHNP3qPvWXEfDC9rQ0nJdXYK" crossorigin="anonymous"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  renderMathInElement(document.body, {
-    delimiters: [
-      {left: "$$", right: "$$", display: true},
-      {left: "\\[", right: "\\]", display: true},
-      {left: "\\(", right: "\\)", display: false},
-    ]
-  });
+  var tries = 0;
+  function ready() {
+    if (typeof renderMathInElement !== "undefined") {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "\\(", right: "\\)", display: false},
+        ]
+      });
+    } else if (tries++ < 50) {
+      setTimeout(ready, 100);
+    }
+  }
+  ready();
 });
 </script>
 {{ end }}
