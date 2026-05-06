@@ -73,5 +73,14 @@ markup:
   goldmark:
     extensions:
       wikilinks: true
+      passthrough:
+        enable: true
+        delimiters:
+          block:
+            - ["$$", "$$"]
+            - ["\\[", "\\]"]
+          inline:
+            - ["\\(", "\\)"]
+            - ["$", "$"]
   highlight:
     noClasses: false

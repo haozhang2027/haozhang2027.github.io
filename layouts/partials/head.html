@@ -1,0 +1,17 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>
+  {{- if .IsHome -}}
+    {{ .Site.Title }}
+  {{- else -}}
+    {{ printf "%s | %s" .Title .Site.Title }}
+  {{- end -}}
+</title>
+{{- with .Site.Params.description }}
+<meta name="description" content="{{ . }}">
+{{- end }}
+{{- with .OutputFormats.Get "RSS" }}
+<link rel="alternate" type="application/rss+xml" href="{{ .RelPermalink }}" title="{{ $.Site.Title }}">
+{{- end }}
+<link rel="stylesheet" href="/css/main.css">
+{{ partial "extend_head.html" . }}
