@@ -66,7 +66,7 @@ $$
 
 其中：
 
-- $\rho_t = \frac{\pi_\theta(o_{i,t} \mid q, o_{i,<t})}{\pi_{\theta_{old}}(o_{i,t} \mid q, o_{i,<t})}$ — 概率比（probability ratio）
+- $\rho_t = \frac{\pi_\theta(o_{i,t} \mid q, o_{i,\lt t})}{\pi_{\theta_{old}}(o_{i,t} \mid q, o_{i,\lt t})}$ — 概率比（probability ratio）
 - $\epsilon$ — clip 范围（通常取 0.2）
 - $\beta$ — KL 惩罚系数
 - $\pi_{ref}$ — 参考模型（通常是初始 SFT 模型，训练期间冻结）
@@ -76,7 +76,7 @@ $$
 GRPO 使用 Schulman et al. (2020) 的无偏估计器（k3 estimator）：
 
 $$
-\mathbb{D}_{KL}(\pi_\theta \parallel \pi_{ref}) = \frac{\pi_{ref}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} - \log\frac{\pi_{ref}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} - 1
+\mathbb{D}_{KL}(\pi_\theta \parallel \pi_{ref}) = \frac{\pi_{ref}(o_{i,t} \mid q, o_{i,\lt t})}{\pi_\theta(o_{i,t} \mid q, o_{i,\lt t})} - \log\frac{\pi_{ref}(o_{i,t} \mid q, o_{i,\lt t})}{\pi_\theta(o_{i,t} \mid q, o_{i,\lt t})} - 1
 $$
 
 > **为什么用这个形式？** 因为它不依赖于对 $\pi_{ref}$ 的采样，是无偏且低方差的估计。
