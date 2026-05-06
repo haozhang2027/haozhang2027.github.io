@@ -33,13 +33,13 @@ GRPO (Group Relative Policy Optimization) = PPO - Critic + 组内标准化奖励
 
 ### 2.1 问题设定
 
-对每个问题 \( q \)，从旧策略 \( \pi_{\theta_{old}} \) 采样一组 \( G \) 条响应：
+对每个问题 $q$，从旧策略 $\pi_{\theta_{old}}$ 采样一组 $G$ 条响应：
 
 $$
 \{o_1, o_2, \ldots, o_G\} \sim \pi_{\theta_{old}}(q)
 $$
 
-每条响应 \( o_i \) 获得一个奖励 \( r_i \)（由奖励模型或规则给出）。
+每条响应 $o_i$ 获得一个奖励 $r_i$（由奖励模型或规则给出）。
 
 ### 2.2 组内相对优势（Group Relative Advantage）
 
@@ -53,7 +53,7 @@ $$
 
 ### 2.3 GRPO 目标函数
 
-对每个问题 \( q \)，损失函数为：
+对每个问题 $q$，损失函数为：
 
 $$
 \begin{aligned}
@@ -66,10 +66,10 @@ $$
 
 其中：
 
-- \( \rho_t = \frac{\pi_\theta(o_{i,t} \mid q, o_{i,<t})}{\pi_{\theta_{old}}(o_{i,t} \mid q, o_{i,<t})} \) — 概率比（probability ratio）
-- \( \epsilon \) — clip 范围（通常取 0.2）
-- \( \beta \) — KL 惩罚系数
-- \( \pi_{ref} \) — 参考模型（通常是初始 SFT 模型，训练期间冻结）
+- $\rho_t = \frac{\pi_\theta(o_{i,t} \mid q, o_{i,<t})}{\pi_{\theta_{old}}(o_{i,t} \mid q, o_{i,<t})}$ — 概率比（probability ratio）
+- $\epsilon$ — clip 范围（通常取 0.2）
+- $\beta$ — KL 惩罚系数
+- $\pi_{ref}$ — 参考模型（通常是初始 SFT 模型，训练期间冻结）
 
 ### 2.4 KL 散度估计
 
@@ -82,7 +82,7 @@ $$
 - 1
 $$
 
-> **为什么用这个形式？** 因为它不依赖于对 \( \pi_{ref} \) 的采样，是无偏且低方差的估计。
+> **为什么用这个形式？** 因为它不依赖于对 $\pi_{ref}$ 的采样，是无偏且低方差的估计。
 
 ---
 
@@ -337,11 +337,11 @@ print("Advantages:\n", adv)
 
 3. **Advantage 的 token 级复用**：同一条响应中所有 token 共享同一个 advantage 值（因为奖励是 response-level 的）。每个 token 位置的 advantage 等于其所属响应的组内标准化奖励。
 
-4. **不需要 GAE 和 λ-return**：因为 advantage 是通过组内相对比较得到的，不依赖于时序差分（TD），省去了 GAE 的所有超参数（\( \gamma, \lambda \)）。
+4. **不需要 GAE 和 λ-return**：因为 advantage 是通过组内相对比较得到的，不依赖于时序差分（TD），省去了 GAE 的所有超参数（$\gamma, \lambda$）。
 
-5. **参考模型作为锚点**：\( \pi_{ref} \) 通常是初始 SFT 模型，训练期间冻结。它确保策略不会偏离太远，防止 reward hacking。
+5. **参考模型作为锚点**：$\pi_{ref}$ 通常是初始 SFT 模型，训练期间冻结。它确保策略不会偏离太远，防止 reward hacking。
 
-6. **无偏 KL 估计**：k3 estimator 不需要对 \( \pi_{ref} \) 采样，比 Monte Carlo 估计更稳定。
+6. **无偏 KL 估计**：k3 estimator 不需要对 $\pi_{ref}$ 采样，比 Monte Carlo 估计更稳定。
 
 ---
 

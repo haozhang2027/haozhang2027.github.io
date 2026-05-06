@@ -78,9 +78,7 @@ markup:
         delimiters:
           block:
             - ["$$", "$$"]
-            - ["\\[", "\\]"]
           inline:
-            - ["\\(", "\\)"]
             - ["$", "$"]
   highlight:
     noClasses: false
