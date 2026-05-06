@@ -76,10 +76,7 @@ $$
 GRPO 使用 Schulman et al. (2020) 的无偏估计器（k3 estimator）：
 
 $$
-\mathbb{D}_{KL}(\pi_\theta \parallel \pi_{ref}) = 
-\frac{\pi_{ref}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} 
-- \log\frac{\pi_{ref}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} 
-- 1
+\mathbb{D}_{KL}(\pi_\theta \parallel \pi_{ref}) = \frac{\pi_{ref}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} - \log\frac{\pi_{ref}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} - 1
 $$
 
 > **为什么用这个形式？** 因为它不依赖于对 $\pi_{ref}$ 的采样，是无偏且低方差的估计。
