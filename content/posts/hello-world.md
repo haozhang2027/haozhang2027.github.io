@@ -12,3 +12,4 @@ categories:
 AI coding 使用指南
 
 1. obsidian+ deepseek +claude code 
+1. test
