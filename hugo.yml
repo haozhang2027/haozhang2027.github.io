@@ -42,6 +42,14 @@ taxonomies:
   tag: tags
   category: categories
 
+minify:
+  disableJS: true
+  disableCSS: false
+  disableHTML: false
+  disableJSON: false
+  disableSVG: false
+  disableXML: false
+
 params:
   env: production
   title: "Hao's Blogs"
