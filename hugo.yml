@@ -79,6 +79,8 @@ params:
 
 markup:
   goldmark:
+    renderer:
+      unsafe: true
     extensions:
       wikilinks: true
       passthrough:
