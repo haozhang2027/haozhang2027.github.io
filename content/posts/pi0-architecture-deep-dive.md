@@ -1176,5 +1176,130 @@ wrist 相机随 end-effector 运动，画面本身就高度关联动作空间。
   <li><strong>KV cache 推理优化</strong>：prefix 算一次，suffix 循环 10 次，这是能做到实时控制（50Hz action chunk）的关键。</li>
 </ul>
 
+<h2 id="s13">13. 常见问题深度解析</h2>
+
+<h3>Q: Transformer 的输入是 image+language+noisy_action+timestep 的 concat 吗？</h3>
+
+<div class="pi0-callout">
+是的，但有重要细节。物理上 token 序列确实是这四部分 concat：
+<pre><code>[img_tokens | lang_tokens | state_token | action_tokens(+time)]
+ ←────── prefix (816) ──────────────────→ ←── suffix (51) ──→</code></pre>
+但"双专家"体现在每个 Transformer layer 内部：prefix 用 PaliGemma 权重，suffix 用 Action Expert 权重。两套独立参数，通过 attention 交互。不是两个独立网络串联，而是同一个 Transformer 对不同位置的 token 用不同参数。
+</div>
+
+<h3>Q: 双专家的权重是拼接起来的吗？</h3>
+
+<div class="pi0-callout">
+不是拼接，是两套完全独立的权重矩阵，按 token 位置分别调用：
+<pre><code>W_q_paligemma  [2048, head_dim]   # 只处理 prefix tokens
+W_q_expert     [1024, head_dim]   # 只处理 suffix tokens</code></pre>
+prefix 输入 dim=2048，suffix 输入 dim=1024，维度不同，权重矩阵不能共用。<br/>
+<strong>K/V concat，Q 不 concat</strong>：两组 K/V 拼成 K_all/V_all [867, head_dim]，但 Q 分开算 attention，因为 prefix 和 suffix 的 mask 不同。
+</div>
+
+<h3>Q: Transformer 输出的是注意力分数吗？</h3>
+
+<div class="pi0-callout">
+不是。注意力分数只是中间计算步骤，最终输出是每个 token 位置的新 embedding：
+<pre><code>attn_scores  = Q @ K.T / sqrt(d)     # [seq, seq] ← 中间量，用完即丢
+attn_weights = softmax(attn_scores + mask)
+attn_out     = attn_weights @ V       # [seq, dim] ← 加权求和，这才是输出
+x = x + attn_out                      # residual
+x = x + FFN(LayerNorm(x))            # FFN
+# 输出 x [seq, dim]：每个 token 的新表示</code></pre>
+π0 取 <code class="pi0-code-inline">suffix_out[:, -50:]</code> 就是取最后 50 个 token 位置的 embedding（每个 [dim] 维向量），然后 Linear 投影到 action_dim=32，得到 v_t。
+</div>
+
+<h3>Q: 推理时为什么同一个 image+language 要跑多次？</h3>
+
+<div class="pi0-callout">
+因为 flow matching 需要迭代去噪 10 步，每步的 noisy_actions x_t 都在变化：
+<pre><code>step1: x_t=noise(t=1.0),  image/lang 相同
+step2: x_t=更新后(t=0.9), image/lang 相同
+...
+step10: x_t=接近动作(t=0.1), image/lang 相同</code></pre>
+image 和 language 每步都一样，但 x_t 每步都不同，suffix tokens 必须重新算。<br/>
+KV cache 的作用：prefix 只算一次存起来，10 步里 suffix 的 Q 直接 attend 缓存的 K/V，避免重复跑 prefix 的 Transformer。
+</div>
+
+<h3>Q: Flow matching 是一个网络还是一种训练方法？</h3>
+
+<div class="pi0-callout">
+Flow matching 是<strong>训练范式</strong>，不是参数。类比：
+<pre><code>监督学习:    loss = MSE(预测值, 真实值)
+Flow matching: loss = MSE(v_t, u_t)
+              其中 u_t = noise - actions（构造的目标）
+                   v_t = Transformer(x_t, t, image, lang)（模型预测）</code></pre>
+参数是 Transformer 的权重，flow matching 定义的是：
+<ul style="margin:0.5rem 0">
+  <li>如何构造训练样本：<code class="pi0-code-inline">x_t = t·noise + (1-t)·actions</code></li>
+  <li>训练目标是什么：预测 velocity field 而不是直接预测动作</li>
+  <li>推理时如何采样：Euler 积分从噪声走到动作</li>
+</ul>
+换成 diffusion（DDPM）也能训同一个 Transformer，只是构造 x_t 的方式和 loss 定义不同。
+</div>
+
+<h3>Q: 为什么不直接让 Transformer 输出动作，而要用 flow matching？</h3>
+
+<div class="pi0-callout">
+核心原因：<strong>动作分布是多峰的</strong>。
+<pre><code>场景：机器人面对杯子，可以从左抓也可以从右抓
+
+直接回归 MSE：
+  样本1: action = 向左 [-1, 0, 0, ...]
+  样本2: action = 向右 [+1, 0, 0, ...]
+  模型学到: action = 均值 = [0, 0, 0, ...]  ← 向前，两个都不是，可能撞到杯子
+
+Flow matching：
+  不同初始噪声 → 不同路径 → 不同合理动作
+  ε₁ → 路径1 → 向左抓  ✓
+  ε₂ → 路径2 → 向右抓  ✓</code></pre>
+直接回归把问题定义为 <code class="pi0-code-inline">f(image, lang) → action</code>（一对一映射），但真实问题是 <code class="pi0-code-inline">p(action | image, lang)</code>（条件概率分布，可以是多峰的）。Flow matching 让 Transformer 学的是<strong>分布</strong>而不是<strong>点估计</strong>，随机性由初始噪声承担。
+</div>
+
+<h3>Q: Euler 积分的原理是什么？</h3>
+
+<div class="pi0-callout">
+有个 ODE：<code class="pi0-code-inline">dx/dt = f(x, t)</code>，已知 x(t=1)=噪声，求 x(t=0)=动作。<br/>
+导数的定义：<code class="pi0-code-inline">dx/dt ≈ Δx/Δt</code>，反解得 <code class="pi0-code-inline">x_next = x_now + dt * f(x_now, t)</code>。<br/>
+就是<strong>用当前点的斜率，往前走一小步</strong>。
+<pre><code>step1: x_0.9 = x_1.0 + (-0.1) * v(x_1.0, t=1.0)
+step2: x_0.8 = x_0.9 + (-0.1) * v(x_0.9, t=0.9)
+...
+step10: x_0.0 = x_0.1 + (-0.1) * v(x_0.1, t=0.1)</code></pre>
+每步都重新问 Transformer："我现在在 x_t，时间是 t，该往哪走？"<br/>
+<strong>为什么不一步到位</strong>：v 在 t=1.0 时估计的方向，到 t=0.0 时已经不准了。路径是弯的，用起点斜率走到终点误差大。10 步重新估计方向，误差累积小。Flow matching 的线性路径让 10 步就够精确，diffusion 路径弯曲需要 100-1000 步。
+</div>
+
+<h3>Q: π0 和 OpenVLA 有什么区别？</h3>
+
+<div class="pi0-callout">
+<table class="pi0-table" style="margin:0.5rem 0">
+  <tr><th></th><th>OpenVLA</th><th>π0</th></tr>
+  <tr><td>动作表示</td><td>离散 token（词表分类）</td><td>连续值（flow matching）</td></tr>
+  <tr><td>输出方式</td><td>一次前向</td><td>迭代 10 步</td></tr>
+  <tr><td>多峰分布</td><td>不支持</td><td>支持（不同噪声→不同动作）</td></tr>
+  <tr><td>动作精度</td><td>受词表粒度限制</td><td>任意精度</td></tr>
+  <tr><td>action horizon</td><td>通常 1 步</td><td>50 步 chunk</td></tr>
+</table>
+两者都用 VLM 处理 image+lang，区别在于<strong>动作头</strong>：OpenVLA 用 next-token prediction，π0 用 flow matching denoiser。
+</div>
+
+<h3>Q: dt 是什么？flow matching 训练改变的参数是哪些？</h3>
+
+<div class="pi0-callout">
+<strong>dt</strong> 是固定值，不是参数：
+<pre><code>dt = -1.0 / num_steps = -1.0 / 10 = -0.1</code></pre>
+负号因为从 t=1（噪声）走到 t=0（动作），时间在减小。<br/><br/>
+<strong>flow matching 训练改变的参数</strong>是整个 Transformer 的权重：
+<pre><code>PaliGemma (gemma_2b)       ← W_q_p, W_k_p, W_v_p, W_ffn_p 等（通常 LoRA 微调）
+Action Expert (gemma_300m) ← W_q_e, W_k_e, W_v_e, W_ffn_e 等（全量训练）
+action_in_proj             ← Linear(32→1024)
+action_out_proj            ← Linear(1024→32)
+action_time_mlp_in/out     ← 时间步融合 MLP
+state_proj                 ← Linear(32→1024)</code></pre>
+Loss = MSE(v_t, u_t) 对以上所有参数求梯度。SigLIP 图像编码器通常冻结。
+</div>
+
 </div>
 {{< /rawhtml >}}
