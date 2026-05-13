@@ -1301,5 +1301,161 @@ state_proj                 ← Linear(32→1024)</code></pre>
 Loss = MSE(v_t, u_t) 对以上所有参数求梯度。SigLIP 图像编码器通常冻结。
 </div>
 
+<h2 id="s14">14. 具体数值示例：完整前向计算</h2>
+
+<p>用最小化数字走一遍完整流程，所有值唯一，便于手动验证。</p>
+
+<h3>参数设定</h3>
+
+<pre><code>B=1, seq_prefix=3, seq_suffix=2, d_p=4, d_e=2, head_dim=3
+prefix tokens: [img_tok, lang_tok1, lang_tok2]
+suffix tokens: [state_tok, action_tok]</code></pre>
+
+<h3>原始 token embeddings（阶段1编码后）</h3>
+
+<pre><code>prefix_tokens [1, 3, 4]:
+  pos0 (img):   [0.1, 0.2, 0.3, 0.4]
+  pos1 (lang1): [0.5, 0.6, 0.7, 0.8]
+  pos2 (lang2): [0.9, 1.0, 1.1, 1.2]
+
+suffix_tokens [1, 2, 2]:
+  pos3 (state):  [1.3, 1.4]
+  pos4 (action): [1.5, 1.6]</code></pre>
+
+<h3>权重矩阵</h3>
+
+<pre><code># PaliGemma（输入 dim=4）
+W_q_p [4,3]: [[0.1,0.2,0.3],[0.4,0.5,0.6],[0.7,0.8,0.9],[1.0,1.1,1.2]]
+W_k_p [4,3]: [[0.7,0.8,0.9],[1.0,1.1,1.2],[1.3,1.4,1.5],[1.6,1.7,1.8]]
+W_v_p [4,3]: [[1.3,1.4,1.5],[1.6,1.7,1.8],[1.9,2.0,2.1],[2.2,2.3,2.4]]
+
+# Action Expert（输入 dim=2）
+W_q_e [2,3]: [[2.5,2.6,2.7],[2.8,2.9,3.0]]
+W_k_e [2,3]: [[3.1,3.2,3.3],[3.4,3.5,3.6]]
+W_v_e [2,3]: [[3.7,3.8,3.9],[4.0,4.1,4.2]]</code></pre>
+
+<h3>计算 Q, K, V</h3>
+
+<pre><code>Q_p = prefix_tokens @ W_q_p  →  [3, 3]:
+  pos0: [0.70, 0.80, 0.90]
+  pos1: [1.58, 1.84, 2.10]
+  pos2: [2.46, 2.88, 3.30]
+
+K_p = prefix_tokens @ W_k_p  →  [3, 3]:
+  pos0: [1.30, 1.40, 1.50]
+  pos1: [3.14, 3.40, 3.66]
+  pos2: [4.98, 5.40, 5.82]
+
+V_p = prefix_tokens @ W_v_p  →  [3, 3]:
+  pos0: [7.00,  7.40,  7.80]
+  pos1: [9.24,  9.80, 10.36]
+  pos2: [11.48, 12.20, 12.92]
+
+Q_s = suffix_tokens @ W_q_e  →  [2, 3]:
+  pos3: [7.17, 7.44, 7.71]
+  pos4: [8.23, 8.54, 8.85]
+
+K_s = suffix_tokens @ W_k_e  →  [2, 3]:
+  pos3: [8.79,  9.06,  9.33]
+  pos4: [10.09, 10.40, 10.71]
+
+V_s = suffix_tokens @ W_v_e  →  [2, 3]:
+  pos3: [10.41, 10.68, 10.95]
+  pos4: [11.95, 12.26, 12.57]</code></pre>
+
+<h3>K_all, V_all 拼接（Q 不拼）</h3>
+
+<pre><code>K_all = concat([K_p, K_s], dim=seq)  [5, 3]:
+  pos0: [1.30,  1.40,  1.50]   ← prefix
+  pos1: [3.14,  3.40,  3.66]   ← prefix
+  pos2: [4.98,  5.40,  5.82]   ← prefix
+  pos3: [8.79,  9.06,  9.33]   ← suffix
+  pos4: [10.09, 10.40, 10.71]  ← suffix
+
+V_all 同理拼接，[5, 3]</code></pre>
+
+<h3>Attention Mask</h3>
+
+<pre><code>ar_mask: prefix=[F,F,F], suffix=[T,F]
+
+可见矩阵（✓=可attend，✗=mask=-inf）:
+         pos0  pos1  pos2  pos3  pos4
+pos0(Q_p)  ✓     ✓     ✓     ✗     ✗
+pos1(Q_p)  ✓     ✓     ✓     ✗     ✗
+pos2(Q_p)  ✓     ✓     ✓     ✗     ✗
+pos3(Q_s)  ✓     ✓     ✓     ✓     ✗   ← state 看不到 action
+pos4(Q_s)  ✓     ✓     ✓     ✓     ✓   ← action 看全部</code></pre>
+
+<h3>Prefix Attention 计算</h3>
+
+<pre><code>scale = 1/sqrt(3) = 0.577
+
+scores_p = Q_p @ K_p.T * 0.577（mask 掉 suffix 列）:
+  pos0: softmax([1.95, 4.74, 7.53, -inf, -inf])
+      → [0.0035, 0.0576, 0.9389]
+  pos1: softmax([4.49, 10.91, 17.33, -inf, -inf])
+      → [0.000003, 0.0016, 0.9984]
+  pos2: softmax([7.03, 17.08, 27.13, -inf, -inf])
+      → [≈0, ≈0, ≈1.0]
+
+attn_out_p = softmax_scores @ V_p:
+  pos0: ≈ [11.34, 12.05, 12.75]
+  pos1: ≈ [11.46, 12.18, 12.90]
+  pos2: ≈ [11.48, 12.20, 12.92]</code></pre>
+
+<h3>Suffix Attention 计算</h3>
+
+<pre><code>scores_s = Q_s @ K_all.T * 0.577:
+  pos3: [18.07, 43.90, 69.72, 116.77, -inf]  ← state 看不到 pos4
+      softmax → ≈ [0, 0, 0, 1.0, 0]
+      attn_out_s[pos3] ≈ V_all[3] = [10.41, 10.68, 10.95]
+
+  pos4: [20.75, 50.36, 80.00, 134.12, 153.85]
+      softmax → ≈ [0, 0, 0, 0, 1.0]
+      attn_out_s[pos4] ≈ V_all[4] = [11.95, 12.26, 12.57]</code></pre>
+
+<div class="pi0-callout pi0-callout-tip">
+注意力分数极度集中是因为数值较大，softmax 放大了差异。真实模型中分布更平滑，但机制相同。
+</div>
+
+<h3>FFN + Residual（示意）</h3>
+
+<pre><code># 两个专家各用自己的 FFN 权重
+prefix_out[i] = LayerNorm(attn_out_p[i] + prefix_tokens[i]) → FFN_paligemma → + residual
+suffix_out[i] = LayerNorm(attn_out_s[i] + suffix_tokens[i]) → FFN_expert   → + residual
+
+# 重复 N 层后取 suffix 最后一个 token
+suffix_out 最后一层 [2, 3]:
+  pos3 (state_tok):  [s0, s1, s2]   ← 丢弃
+  pos4 (action_tok): [a0, a1, a2]   ← 取这个
+
+→ action_out_proj Linear(3→action_dim)
+→ v_t  [1, action_dim]</code></pre>
+
+<h3>Flow Matching 训练 Loss</h3>
+
+<pre><code># 训练时构造
+t = 0.7  (beta分布采样)
+x_t = 0.7 * noise + 0.3 * actions   # 带噪动作，送进 Transformer
+u_t = noise - actions                # ground truth velocity
+
+# 模型输出
+v_t = action_out_proj(suffix_out[:, -H:])   # [B, 50, 32]
+
+loss = MSE(v_t, u_t)   # 反向传播更新所有参数</code></pre>
+
+<h3>推理 Euler 积分（10步）</h3>
+
+<pre><code>x_t = pure noise [B, 50, 32]   t=1.0,  dt=-0.1
+
+step1:  embed_suffix(x_t=noise, t=1.0) → Transformer → v_t → x_t = x_t + (-0.1)*v_t,  t=0.9
+step2:  embed_suffix(x_t,       t=0.9) → Transformer → v_t → x_t = x_t + (-0.1)*v_t,  t=0.8
+...
+step10: embed_suffix(x_t,       t=0.1) → Transformer → v_t → x_t = x_t + (-0.1)*v_t,  t=0.0
+
+x_0 [B, 50, 32]  ← 最终预测动作序列
+
+# prefix 的 KV cache 在循环外算一次，10步只重复算 suffix 部分</code></pre>
+
 </div>
 {{< /rawhtml >}}
