@@ -9,7 +9,7 @@ tags:
   - LLM
   - RLHF
 categories:
-  - tech
+  - others
 ---
 
 ## 一句话定义

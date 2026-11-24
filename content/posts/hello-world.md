@@ -6,7 +6,7 @@ tags:
   - intro
   - blog
 categories:
-  - updates
+  - others
 ---
 
 AI coding 使用指南

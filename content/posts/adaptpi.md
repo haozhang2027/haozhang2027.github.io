@@ -12,7 +12,7 @@ tags:
   - pi0.5
   - Imitation Learning
 categories:
-  - 具身智能
+  - embodied-post-training
 ---
 
 {{< rawhtml >}}

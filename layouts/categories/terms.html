@@ -1,0 +1,23 @@
+{{ define "main" }}
+<section class="research-category" aria-labelledby="research-categories-title">
+  <header class="research-page-heading">
+    <a class="research-back" href="{{ "/" | relURL }}"><span aria-hidden="true">←</span> 首页</a>
+    <p class="research-eyebrow">Research collections</p>
+    <h1 id="research-categories-title">研究与记录</h1>
+    <p class="research-intro">从一个方向开始阅读。</p>
+  </header>
+  <div class="topic-grid">
+    {{ range $index, $topic := hugo.Data.topics }}
+      {{ $category := site.GetPage (printf "/categories/%s" $topic.slug) }}
+      {{ $count := 0 }}
+      {{ with $category }}{{ $count = len .Pages }}{{ end }}
+      <a class="topic-card" href="{{ printf "/categories/%s/" $topic.slug | relURL }}">
+        <span class="topic-card-topline"><span class="topic-number" aria-hidden="true">{{ printf "%02d" (add $index 1) }}</span><span class="topic-count">{{ $count }} 篇</span></span>
+        <h2>{{ $topic.title }}</h2>
+        <p>{{ $topic.description }}</p>
+        <span class="topic-card-action">查看分类 <span aria-hidden="true">→</span></span>
+      </a>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

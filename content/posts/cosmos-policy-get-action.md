@@ -10,7 +10,7 @@ tags:
   - cosmos
   - nvidia
 categories:
-  - 源码解析
+  - embodied-post-training
 ---
 
 ## 1. 概述

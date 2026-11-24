@@ -1,0 +1,11 @@
+{{ $currentPage := . }}
+<header class="research-topbar">
+  <a class="research-brand" href="{{ "/" | relURL }}"{{ if .IsHome }} aria-current="page"{{ end }}>{{ .Site.Title }}</a>
+  <nav class="research-nav" aria-label="主导航">
+    {{ range .Site.Menus.main }}
+      {{ $url := .URL | relURL }}
+      {{ $active := or (eq $currentPage.RelPermalink $url) (and (ne $url ("/" | relURL)) (hasPrefix $currentPage.RelPermalink $url)) }}
+      <a href="{{ $url }}"{{ if $active }} class="research-nav-current" aria-current="{{ if eq $currentPage.RelPermalink $url }}page{{ else }}location{{ end }}"{{ end }}>{{ .Name }}</a>
+    {{ end }}
+  </nav>
+</header>

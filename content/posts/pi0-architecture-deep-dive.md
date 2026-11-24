@@ -9,7 +9,7 @@ tags:
   - Flow Matching
   - PaliGemma
 categories:
-  - 具身智能
+  - embodied-post-training
 ---
 
 {{< rawhtml >}}

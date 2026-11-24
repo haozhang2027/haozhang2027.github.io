@@ -10,7 +10,7 @@ tags:
   - RLHF
   - 训练
 categories:
-  - tech
+  - others
 ---
 
 ## 总览

@@ -1,0 +1,51 @@
+{{ define "main" }}
+<section class="research-hero" aria-labelledby="research-title">
+  <p class="research-eyebrow">Research notes</p>
+  <h1 id="research-title">{{ .Site.Title }}</h1>
+  <p class="research-intro">关于具身后训练、Agentic robotics 与学习探索的记录。</p>
+</section>
+
+<section class="research-topics" aria-labelledby="research-topics-title">
+  <div class="research-section-heading">
+    <h2 id="research-topics-title">研究与记录</h2>
+    <span class="research-caption">按方向阅读</span>
+  </div>
+  <div class="topic-grid">
+    {{ range $index, $topic := hugo.Data.topics }}
+      {{ $category := site.GetPage (printf "/categories/%s" $topic.slug) }}
+      {{ $count := 0 }}
+      {{ with $category }}{{ $count = len .Pages }}{{ end }}
+      <a class="topic-card" href="{{ printf "/categories/%s/" $topic.slug | relURL }}">
+        <span class="topic-card-topline"><span class="topic-number" aria-hidden="true">{{ printf "%02d" (add $index 1) }}</span><span class="topic-count">{{ $count }} 篇</span></span>
+        <h3>{{ $topic.title }}</h3>
+        <p>{{ $topic.description }}</p>
+        <span class="topic-card-action">查看分类 <span aria-hidden="true">→</span></span>
+      </a>
+    {{ end }}
+  </div>
+</section>
+
+<div class="research-streams">
+  {{ range $index, $topic := hugo.Data.topics }}
+    {{ $category := site.GetPage (printf "/categories/%s" $topic.slug) }}
+    {{ $posts := slice }}
+    {{ with $category }}{{ $posts = .Pages.ByDate.Reverse }}{{ end }}
+    <section class="research-stream" aria-labelledby="topic-{{ $topic.slug }}">
+      <div class="research-section-heading">
+        <h2 id="topic-{{ $topic.slug }}">{{ $topic.title }}</h2>
+        <a class="research-more" href="{{ printf "/categories/%s/" $topic.slug | relURL }}" aria-label="查看 {{ $topic.title }} 的全部文章">全部文章 <span aria-hidden="true">→</span></a>
+      </div>
+      {{ if $posts }}
+        <div class="topic-post-list">
+          {{ range first 3 $posts }}{{ partial "topic-post.html" . }}{{ end }}
+        </div>
+      {{ else }}
+        <div class="topic-empty">
+          <p class="topic-empty-title">暂无文章</p>
+          <p>这个方向的笔记将在这里更新。</p>
+        </div>
+      {{ end }}
+    </section>
+  {{ end }}
+</div>
+{{ end }}

@@ -9,7 +9,7 @@ tags:
   - pi0
   - deep-learning
 categories:
-  - robotics
+  - embodied-post-training
 ---
 
 {{< rawhtml >}}
