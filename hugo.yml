@@ -38,6 +38,7 @@ menus:
 taxonomies:
   tag: tags
   category: categories
+  track: tracks
 
 minify:
   disableJS: true

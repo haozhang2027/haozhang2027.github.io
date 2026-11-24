@@ -10,6 +10,8 @@ tags:
   - deep-learning
 categories:
   - embodied-post-training
+tracks:
+  - vla
 ---
 
 {{< rawhtml >}}

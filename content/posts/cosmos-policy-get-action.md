@@ -11,6 +11,8 @@ tags:
   - nvidia
 categories:
   - embodied-post-training
+tracks:
+  - wam
 ---
 
 ## 1. 概述

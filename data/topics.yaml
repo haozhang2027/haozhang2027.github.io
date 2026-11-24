@@ -1,6 +1,6 @@
 - slug: embodied-post-training
   title: 具身后训练
-  description: VLA、世界模型与机器人策略学习的论文、方法和实践。
+  description: VLA、WAM 与具身强化学习的论文、方法和实践。
 - slug: agentic-robotics
   title: Agentic robotics
   description: 机器人任务规划、工具使用与智能体协作。

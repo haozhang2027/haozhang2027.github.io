@@ -12,6 +12,8 @@ tags:
   - architecture
 categories:
   - embodied-post-training
+tracks:
+  - wam
 ---
 
 {{< rawhtml >}}

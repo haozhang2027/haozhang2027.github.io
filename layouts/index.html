@@ -35,6 +35,9 @@
         <h2 id="topic-{{ $topic.slug }}">{{ $topic.title }}</h2>
         <a class="research-more" href="{{ printf "/categories/%s/" $topic.slug | relURL }}" aria-label="查看 {{ $topic.title }} 的全部文章">全部文章 <span aria-hidden="true">→</span></a>
       </div>
+      {{ if eq $topic.slug "embodied-post-training" }}
+        {{ partial "embodied-navigation.html" $ }}
+      {{ end }}
       {{ if $posts }}
         <div class="topic-post-list">
           {{ range first 3 $posts }}{{ partial "topic-post.html" . }}{{ end }}

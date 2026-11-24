@@ -1,0 +1,16 @@
+{{ define "main" }}
+<section class="research-category" aria-labelledby="research-subtopics-title">
+  <header class="research-page-heading">
+    <a class="research-back" href="{{ "/categories/embodied-post-training/" | relURL }}"><span aria-hidden="true">←</span> 具身后训练</a>
+    <p class="research-eyebrow">具身后训练</p>
+    <h1 id="research-subtopics-title">细分方向</h1>
+    <p class="research-intro">从 VLA、WAM 或 EmbodyRL 开始阅读。</p>
+  </header>
+  <section aria-labelledby="research-subtopics-list-title">
+    <div class="research-section-heading">
+      <h2 id="research-subtopics-list-title">选择一个方向</h2>
+    </div>
+    {{ partial "embodied-cards.html" . }}
+  </section>
+</section>
+{{ end }}

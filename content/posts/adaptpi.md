@@ -13,6 +13,8 @@ tags:
   - Imitation Learning
 categories:
   - embodied-post-training
+tracks:
+  - vla
 ---
 
 {{< rawhtml >}}

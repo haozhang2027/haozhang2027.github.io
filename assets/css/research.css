@@ -398,3 +398,46 @@
     transform: none;
   }
 }
+
+.research-subtopic-card {
+  min-height: 190px;
+  padding: 22px;
+}
+
+.research-subtopic-card .topic-card-topline {
+  margin-bottom: 18px;
+}
+
+.research-subtopic-navigation {
+  margin-bottom: 28px;
+}
+
+.research-subtopic-navigation a {
+  gap: 8px;
+}
+
+.research-subtopic-count {
+  font-size: .72rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.research-stream .research-subtopic-navigation {
+  margin-top: -2px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 640px) {
+  .research-subtopic-card {
+    min-height: 0;
+  }
+
+  .research-subtopic-navigation {
+    gap: 8px;
+  }
+
+  .research-subtopic-navigation a {
+    min-height: 44px;
+    padding-inline: 12px;
+  }
+}

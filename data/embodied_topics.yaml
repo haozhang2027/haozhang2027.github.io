@@ -1,0 +1,9 @@
+- slug: vla
+  title: VLA
+  description: 视觉语言动作模型、Flow Matching 与策略适配。
+- slug: wam
+  title: WAM
+  description: 世界动作模型，联合建模动作与未来状态。
+- slug: embodyrl
+  title: EmbodyRL
+  description: 具身强化学习、世界模型控制与策略优化。

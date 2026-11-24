@@ -10,6 +10,8 @@ tags:
   - PaliGemma
 categories:
   - embodied-post-training
+tracks:
+  - vla
 ---
 
 {{< rawhtml >}}

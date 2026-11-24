@@ -7,6 +7,9 @@
         {{ range .GetTerms "categories" }}
           <span aria-hidden="true"> / </span><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
         {{ end }}
+        {{ range .GetTerms "tracks" }}
+          <span aria-hidden="true"> / </span><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+        {{ end }}
       {{ else }}
         <a href="{{ "/" | relURL }}">首页</a>
       {{ end }}

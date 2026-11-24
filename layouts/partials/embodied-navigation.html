@@ -1,0 +1,15 @@
+{{ $currentPage := . }}
+{{ $parent := site.GetPage "/categories/embodied-post-training" }}
+{{ $parentURL := "/categories/embodied-post-training/" | relURL }}
+{{ $parentCount := 0 }}
+{{ with $parent }}{{ $parentURL = .RelPermalink }}{{ $parentCount = len .Pages }}{{ end }}
+<nav class="topic-navigation research-subtopic-navigation" aria-label="具身后训练细分方向">
+  <a href="{{ $parentURL }}"{{ if eq $currentPage.RelPermalink $parentURL }} class="topic-navigation-current" aria-current="page"{{ end }}>全部 <span class="research-subtopic-count">{{ $parentCount }} 篇</span></a>
+  {{ range hugo.Data.embodied_topics }}
+    {{ $track := site.GetPage (printf "/tracks/%s" .slug) }}
+    {{ $url := printf "/categories/embodied-post-training/%s/" .slug | relURL }}
+    {{ $count := 0 }}
+    {{ with $track }}{{ $url = .RelPermalink }}{{ $count = len .Pages }}{{ end }}
+    <a href="{{ $url }}"{{ if eq $currentPage.RelPermalink $url }} class="topic-navigation-current" aria-current="page"{{ end }}>{{ .title }} <span class="research-subtopic-count">{{ $count }} 篇</span></a>
+  {{ end }}
+</nav>

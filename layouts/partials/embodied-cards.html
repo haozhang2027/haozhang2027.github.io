@@ -1,0 +1,14 @@
+<div class="topic-grid research-subtopic-grid">
+  {{ range $index, $topic := hugo.Data.embodied_topics }}
+    {{ $track := site.GetPage (printf "/tracks/%s" $topic.slug) }}
+    {{ $url := printf "/categories/embodied-post-training/%s/" $topic.slug | relURL }}
+    {{ $count := 0 }}
+    {{ with $track }}{{ $url = .RelPermalink }}{{ $count = len .Pages }}{{ end }}
+    <a class="topic-card research-subtopic-card" href="{{ $url }}">
+      <span class="topic-card-topline"><span class="topic-number" aria-hidden="true">{{ printf "%02d" (add $index 1) }}</span><span class="topic-count">{{ $count }} 篇</span></span>
+      <h3>{{ $topic.title }}</h3>
+      <p>{{ $topic.description }}</p>
+      <span class="topic-card-action">查看文章 <span aria-hidden="true">→</span></span>
+    </a>
+  {{ end }}
+</div>

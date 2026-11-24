@@ -1,0 +1,36 @@
+{{ define "main" }}
+{{ $currentPage := . }}
+{{ $description := .Description }}
+{{ range hugo.Data.embodied_topics }}
+  {{ $track := site.GetPage (printf "/tracks/%s" .slug) }}
+  {{ if and $track (eq $track.RelPermalink $currentPage.RelPermalink) }}
+    {{ $description = .description }}
+  {{ end }}
+{{ end }}
+<section class="research-category" aria-labelledby="research-subtopic-title">
+  <header class="research-page-heading">
+    <a class="research-back" href="{{ "/categories/embodied-post-training/" | relURL }}"><span aria-hidden="true">←</span> 具身后训练</a>
+    <p class="research-eyebrow">具身后训练</p>
+    <h1 id="research-subtopic-title">{{ .Title }}</h1>
+    {{ with $description }}<p class="research-intro">{{ . }}</p>{{ end }}
+  </header>
+
+  {{ partial "embodied-navigation.html" . }}
+
+  <div class="research-section-heading research-list-heading">
+    <h2>文章</h2>
+    <span class="research-caption">{{ len .Pages }} 篇</span>
+  </div>
+  {{ if .Pages }}
+    <div class="topic-post-list">
+      {{ range .Pages.ByDate.Reverse }}{{ partial "topic-post.html" . }}{{ end }}
+    </div>
+  {{ else }}
+    <div class="topic-empty">
+      <p class="topic-empty-title">暂无文章</p>
+      <p>这个方向的笔记将在这里更新。</p>
+      <a href="{{ "/categories/embodied-post-training/" | relURL }}">浏览具身后训练的全部文章 <span aria-hidden="true">→</span></a>
+    </div>
+  {{ end }}
+</section>
+{{ end }}

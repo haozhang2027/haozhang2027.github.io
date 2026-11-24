@@ -23,6 +23,33 @@
     {{ end }}
   </nav>
 
+  {{ if eq .RelPermalink ("/categories/embodied-post-training/" | relURL) }}
+    <section class="research-subtopics" aria-labelledby="embodied-subtopics-heading">
+      <div class="research-section-heading">
+        <h2 id="embodied-subtopics-heading">细分方向</h2>
+        <span class="research-caption">{{ len .Pages }} 篇文章</span>
+      </div>
+      {{ partial "embodied-cards.html" . }}
+    </section>
+    <div class="research-streams">
+      {{ range hugo.Data.embodied_topics }}
+        {{ $track := site.GetPage (printf "/tracks/%s" .slug) }}
+        <section class="research-stream" aria-labelledby="embodied-{{ .slug }}">
+          <div class="research-section-heading">
+            <h2 id="embodied-{{ .slug }}">{{ .title }}</h2>
+            <a class="research-more" href="{{ $track.RelPermalink }}" aria-label="查看 {{ .title }} 的全部文章">全部文章 <span aria-hidden="true">→</span></a>
+          </div>
+          {{ with $track.Pages }}
+            <div class="topic-post-list">
+              {{ range .ByDate.Reverse }}{{ partial "topic-post.html" . }}{{ end }}
+            </div>
+          {{ else }}
+            <div class="topic-empty"><p class="topic-empty-title">暂无文章</p><p>这个方向的笔记将在这里更新。</p></div>
+          {{ end }}
+        </section>
+      {{ end }}
+    </div>
+  {{ else }}
   <div class="research-section-heading research-list-heading">
     <h2>文章</h2>
     <span class="research-caption">{{ len .Pages }} 篇</span>
@@ -37,6 +64,7 @@
       <p>这个方向的笔记将在这里更新。</p>
       <a href="{{ "/posts/" | relURL }}">浏览全部文章 <span aria-hidden="true">→</span></a>
     </div>
+  {{ end }}
   {{ end }}
 </section>
 {{ end }}
